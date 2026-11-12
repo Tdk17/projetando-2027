@@ -39,6 +39,7 @@ class _CampaignPageState extends State<CampaignPage> {
   double zoom = 1, initialZoom = 1;
   Offset offset = Offset.zero, initialOffset = Offset.zero, initialFocal = Offset.zero;
   bool busy = false;
+  bool circularPreview = true;
   final preview = GlobalKey();
   int get width => format == Format.avatar ? 1080 : 1920;
   int get height => 1080;
@@ -76,6 +77,7 @@ class _CampaignPageState extends State<CampaignPage> {
       frame = null;
       zoom = 1;
       offset = Offset.zero;
+      circularPreview = true;
     });
     loadFrame();
   }
@@ -202,8 +204,20 @@ class _CampaignPageState extends State<CampaignPage> {
         ));
       }).toList()),
       const SizedBox(height: 15),
+      if (format == Format.avatar) ...[
+        Row(children: [
+          const Icon(Icons.account_circle_outlined, color: mint, size: 18),
+          const SizedBox(width: 8),
+          const Expanded(child: Text('Simular recorte do Instagram',
+            style: TextStyle(color: cream, fontSize: 12))),
+          Switch.adaptive(value: circularPreview,
+            onChanged: (v) => setState(() => circularPreview = v)),
+        ]),
+        const SizedBox(height: 10),
+      ],
       AspectRatio(aspectRatio: width / height,
-        child: ClipRRect(borderRadius: BorderRadius.circular(13),
+        child: ClipOval(clipBehavior: Clip.antiAlias,
+          child: ClipRRect(borderRadius: BorderRadius.circular(13),
           child: GestureDetector(
             onScaleStart: photo == null ? null : (d) {
               initialZoom = zoom; initialOffset = offset; initialFocal = d.focalPoint;
@@ -212,14 +226,17 @@ class _CampaignPageState extends State<CampaignPage> {
               zoom = (initialZoom * d.scale).clamp(1.0, 4.0);
               offset = initialOffset + d.focalPoint - initialFocal;
             }),
-            child: CustomPaint(key: preview,
+            child: ClipPath(
+              clipper: format == Format.avatar && circularPreview
+                  ? const CircleCropClipper() : const RectangleCropClipper(),
+              child: CustomPaint(key: preview,
               painter: ArtPainter(photo: photo, frame: frame, zoom: zoom, offset: offset),
               child: photo == null ? const Center(child: Column(
                 mainAxisSize: MainAxisSize.min, children: [
                   Icon(Icons.add_photo_alternate_outlined, color: cream, size: 36),
                   SizedBox(height: 9),
                   Text('Sua foto aparecerá aqui', style: TextStyle(color: cream)),
-                ])) : null),
+                ])) : null)),
           ))),
       if (frame == null) const Padding(padding: EdgeInsets.only(top: 8),
         child: Text('Arte provisória: aguardando moldura PNG oficial.',
@@ -237,6 +254,12 @@ class _CampaignPageState extends State<CampaignPage> {
             zoom = 1; offset = Offset.zero;
           }), icon: const Icon(Icons.restart_alt)),
         ]),
+        const Text('Posição horizontal', style: TextStyle(fontSize: 12, color: cream)),
+        Slider(value: offset.dx.clamp(-200.0, 200.0), min: -200, max: 200,
+          onChanged: (v) => setState(() => offset = Offset(v, offset.dy))),
+        const Text('Posição vertical', style: TextStyle(fontSize: 12, color: cream)),
+        Slider(value: offset.dy.clamp(-200.0, 200.0), min: -200, max: 200,
+          onChanged: (v) => setState(() => offset = Offset(offset.dx, v))),
       ],
       const SizedBox(height: 16),
       SizedBox(width: double.infinity, child: FilledButton.icon(
@@ -316,4 +339,20 @@ class ArtPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant ArtPainter old) =>
     old.photo != photo || old.frame != frame || old.zoom != zoom || old.offset != offset;
+}
+
+class CircleCropClipper extends CustomClipper<Path> {
+  const CircleCropClipper();
+  @override
+  Path getClip(Size size) => Path()..addOval(Rect.fromLTWH(0, 0, size.width, size.height));
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+class RectangleCropClipper extends CustomClipper<Path> {
+  const RectangleCropClipper();
+  @override
+  Path getClip(Size size) => Path()..addRect(Offset.zero & size);
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
