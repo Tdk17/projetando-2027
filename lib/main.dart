@@ -58,7 +58,7 @@ class _CampaignPageState extends State<CampaignPage> {
   Future<void> loadFrame() async {
     final requested = format;
     try {
-      final data = await rootBundle.load('assets/frames/' + requested.name + '.png');
+      final data = await rootBundle.load('assets/frames/' + (requested == Format.avatar ? 'RMC - AVATAR.png' : 'banner.png'));
       final decoded = await decode(data.buffer.asUint8List());
       if (!mounted || requested != format) { decoded.dispose(); return; }
       setState(() { frame?.dispose(); frame = decoded; });
