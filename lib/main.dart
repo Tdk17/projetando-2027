@@ -131,11 +131,13 @@ class _CampaignPageState extends State<CampaignPage> {
 
   @override
   Widget build(BuildContext context) {
-    final wide = MediaQuery.sizeOf(context).width >= 850;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final wide = screenWidth >= 900;
+    final compact = screenWidth < 480;
     return Scaffold(body: SingleChildScrollView(child: Column(children: [
       Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(horizontal: wide ? 60 : 20, vertical: 23),
+        padding: EdgeInsets.symmetric(horizontal: wide ? 60 : (compact ? 16 : 24), vertical: compact ? 16 : 23),
         decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0xFF2C5055)))),
         child: const Row(children: [
           Icon(Icons.auto_awesome, color: mint),
@@ -145,10 +147,10 @@ class _CampaignPageState extends State<CampaignPage> {
         ]),
       ),
       ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1200),
-        child: Padding(padding: EdgeInsets.all(wide ? 45 : 20),
+        child: Padding(padding: EdgeInsets.all(wide ? 45 : (compact ? 12 : 24)),
           child: wide
               ? Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                  Expanded(child: intro()), const SizedBox(width: 60), Expanded(child: editor()),
+                  Expanded(child: intro()), const SizedBox(width: 40), Expanded(child: editor()),
                 ])
               : Column(children: [intro(), const SizedBox(height: 33), editor()]),
         )),
@@ -159,16 +161,16 @@ class _CampaignPageState extends State<CampaignPage> {
     ])));
   }
 
-  Widget intro() => const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text('CAMPANHA 2027', style: TextStyle(color: mint, letterSpacing: 4, fontWeight: FontWeight.w800)),
-    SizedBox(height: 15),
+  Widget intro() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    const Text('CAMPANHA 2027', style: TextStyle(color: mint, letterSpacing: 4, fontWeight: FontWeight.w800)),
+    const SizedBox(height: 15),
     Text('O FUTURO\nCOMEÇA COM\nUMA VISÃO.',
-      style: TextStyle(color: cream, fontSize: 44, fontWeight: FontWeight.w900, height: 1.12, letterSpacing: -1.4)),
-    SizedBox(height: 20),
-    Text('Estamos projetando 2027. Um novo tempo de sonhos, propósitos e realizações. Faça parte desse movimento.',
+      style: TextStyle(color: cream, fontSize: MediaQuery.sizeOf(context).width < 480 ? 34 : 44, fontWeight: FontWeight.w900, height: 1.12, letterSpacing: -1.4)),
+    const SizedBox(height: 20),
+    const Text('Estamos projetando 2027. Um novo tempo de sonhos, propósitos e realizações. Faça parte desse movimento.',
       style: TextStyle(color: Color(0xFFBDD0CD), fontSize: 16, height: 1.6)),
-    SizedBox(height: 22),
-    Row(children: [
+    const SizedBox(height: 22),
+    const Row(children: [
       Icon(Icons.check_circle_outline, color: mint, size: 20),
       SizedBox(width: 8),
       Expanded(child: Text('Crie sua foto e compartilhe essa visão.',
@@ -177,7 +179,8 @@ class _CampaignPageState extends State<CampaignPage> {
   ]);
 
   Widget editor() => Container(
-    padding: const EdgeInsets.all(20),
+    width: double.infinity,
+    padding: EdgeInsets.all(MediaQuery.sizeOf(context).width < 480 ? 14 : 20),
     decoration: BoxDecoration(
       color: surface, border: Border.all(color: const Color(0xFF2B535A)),
       borderRadius: BorderRadius.circular(22),
@@ -242,7 +245,7 @@ class _CampaignPageState extends State<CampaignPage> {
           style: TextStyle(color: Color(0xFFF2D18A), fontSize: 12))),
       if (photo != null) ...[
         const SizedBox(height: 12),
-        const Text('Arraste para ajustar a posição e o zoom.',
+        const Text('Arraste com o dedo para mover; use dois dedos para ampliar.',
           style: TextStyle(fontSize: 12, color: Color(0xFFB9CBC8))),
         Row(children: [
           const Icon(Icons.zoom_out, color: mint, size: 19),
