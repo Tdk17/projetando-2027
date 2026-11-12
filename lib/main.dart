@@ -59,7 +59,7 @@ class _CampaignPageState extends State<CampaignPage> {
   Future<void> loadFrame() async {
     final requested = format;
     try {
-      final data = await rootBundle.load('assets/frames/' + (requested == Format.avatar ? 'RMC - AVATAR.png' : 'banner.png'));
+      final data = await rootBundle.load('assets/frames/RMC - AVATAR.png');
       final decoded = await decode(data.buffer.asUint8List());
       if (!mounted || requested != format) { decoded.dispose(); return; }
       setState(() { frame?.dispose(); frame = decoded; });
@@ -241,7 +241,7 @@ class _CampaignPageState extends State<CampaignPage> {
                 ])) : null)),
           ))),
       if (frame == null) const Padding(padding: EdgeInsets.only(top: 8),
-        child: Text('Arte provisória: aguardando moldura PNG oficial.',
+        child: Text('Não foi possível carregar a moldura oficial.',
           style: TextStyle(color: Color(0xFFF2D18A), fontSize: 12))),
       if (photo != null) ...[
         const SizedBox(height: 12),
@@ -311,9 +311,16 @@ class ArtPainter extends CustomPainter {
       canvas.restore();
     }
     if (frame != null) {
+      final frameSize = Size(frame.width.toDouble(), frame.height.toDouble());
+      final fitScale = math.min(size.width / frameSize.width, size.height / frameSize.height);
+      final overlayRect = Rect.fromCenter(
+        center: size.center(Offset.zero),
+        width: frameSize.width * fitScale,
+        height: frameSize.height * fitScale,
+      );
       canvas.drawImageRect(frame,
-        Rect.fromLTWH(0, 0, frame.width.toDouble(), frame.height.toDouble()),
-        Offset.zero & size, Paint()..filterQuality = FilterQuality.high);
+        Offset.zero & frameSize,
+        overlayRect, Paint()..filterQuality = FilterQuality.high);
     } else {
       canvas.save();
       canvas.scale(size.width / 1080, size.height / 1080);
