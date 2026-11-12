@@ -236,7 +236,7 @@ class _CampaignPageState extends State<CampaignPage> {
                   SizedBox(height: 9),
                   Text('Sua foto aparecerá aqui', style: TextStyle(color: cream)),
                 ])) : null)),
-          )),
+          ))),
       if (frame == null) const Padding(padding: EdgeInsets.only(top: 8),
         child: Text('Arte provisória: aguardando moldura PNG oficial.',
           style: TextStyle(color: Color(0xFFF2D18A), fontSize: 12))),
