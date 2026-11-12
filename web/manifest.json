@@ -1,0 +1,9 @@
+{
+  "name": "Projetando 2027 | Igreja Remanescentes",
+  "short_name": "Projetando 2027",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#071D25",
+  "theme_color": "#071D25",
+  "lang": "pt-BR"
+}

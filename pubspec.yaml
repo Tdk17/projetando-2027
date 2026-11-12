@@ -1,0 +1,14 @@
+name: projetando_2027
+description: Campanha Projetando 2027 em Flutter Web
+publish_to: none
+version: 1.0.0+1
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  file_picker: ^8.3.7
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/frames/
