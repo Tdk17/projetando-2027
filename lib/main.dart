@@ -218,8 +218,12 @@ class _CampaignPageState extends State<CampaignPage> {
         ]),
         const SizedBox(height: 10),
       ],
-      AspectRatio(aspectRatio: width / height,
-        child: ClipRRect(borderRadius: BorderRadius.circular(13),
+      Center(child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: format == Format.avatar ? 420 : double.infinity),
+        child: AspectRatio(aspectRatio: width / height,
+        child: ClipPath(
+          clipper: format == Format.avatar && circularPreview
+              ? const CircleCropClipper() : const RectangleCropClipper(),
           child: GestureDetector(
             onScaleStart: photo == null ? null : (d) {
               initialZoom = zoom; initialOffset = offset; initialFocal = d.focalPoint;
@@ -239,7 +243,12 @@ class _CampaignPageState extends State<CampaignPage> {
                   SizedBox(height: 9),
                   Text('Sua foto aparecerá aqui', style: TextStyle(color: cream)),
                 ])) : null)),
-          ))),
+          ))))),
+      Padding(padding: const EdgeInsets.only(top: 8),
+        child: Text(format == Format.avatar
+          ? 'Prévia do perfil do Instagram • arquivo final 1080 × 1080'
+          : 'Prévia horizontal do banner • arquivo final 1920 × 1080',
+          style: const TextStyle(fontSize: 12, color: mint), textAlign: TextAlign.center)),
       if (frame == null) const Padding(padding: EdgeInsets.only(top: 8),
         child: Text('Não foi possível carregar a moldura oficial.',
           style: TextStyle(color: Color(0xFFF2D18A), fontSize: 12))),
